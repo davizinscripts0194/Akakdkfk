@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minha Câmera</title>
+
+<style>
+body{
+    margin:0;
+    background:black;
+    overflow:hidden;
+}
+
+#camera{
+    width:100vw;
+    height:100vh;
+    object-fit:cover;
+}
+
+#foto{
+    position:fixed;
+    bottom:30px;
+    left:50%;
+    transform:translateX(-50%);
+    width:85px;
+    height:85px;
+    border-radius:50%;
+    border:6px solid white;
+    background:rgba(255,255,255,0.2);
+}
+
+canvas{
+    display:none;
+}
+</style>
+</head>
+<body>
+
+<video id="camera" autoplay playsinline></video>
+
+<button id="foto"></button>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const camera = document.getElementById("camera");
+const canvas = document.getElementById("canvas");
+
+async function iniciarCamera(){
+    try{
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video:{
+                facingMode:"environment"
+            },
+            audio:false
+        });
+
+        camera.srcObject = stream;
+    }catch(e){
+        alert("Permissão da câmera negada!");
+    }
+}
+
+iniciarCamera();
+
+document.getElementById("foto").addEventListener("click",()=>{
+    canvas.width = camera.videoWidth;
+    canvas.height = camera.videoHeight;
+
+    canvas.getContext("2d").drawImage(
+        camera,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = "foto.png";
+    link.click();
+});
+</script>
+
+</body>
+</html>
